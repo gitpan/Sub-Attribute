@@ -17,21 +17,21 @@ typedef struct {
 START_MY_CXT
 
 enum {
-	M_KLASS,
-	M_CODE,
-	M_NAME,
-	M_DATA,
-	M_METHOD
+	SA_KLASS,
+	SA_CODE,
+	SA_NAME,
+	SA_DATA,
+	SA_METHOD
 };
 
 static void
 apply_handler(pTHX_ pMY_CXT_ AV* const handler){
-	SV* const klass        = AvARRAY(handler)[M_KLASS];
-	SV* const code_ref     = AvARRAY(handler)[M_CODE];
+	SV* const klass        = AvARRAY(handler)[SA_KLASS];
+	SV* const code_ref     = AvARRAY(handler)[SA_CODE];
 	CV* const cv           = (CV*)SvRV(code_ref);
-	SV* const name         = AvARRAY(handler)[M_NAME];
-	SV* const data         = AvARRAY(handler)[M_DATA];
-	SV* const method       = AvARRAY(handler)[M_METHOD];
+	SV* const name         = AvARRAY(handler)[SA_NAME];
+	SV* const data         = AvARRAY(handler)[SA_DATA];
+	SV* const method       = AvARRAY(handler)[SA_METHOD];
 	dSP;
 
 	if(!CvGV(cv)){ /* dying by bad attributes */
@@ -200,13 +200,13 @@ PPCODE:
 		if(meth && MgFind((SV*)GvCV(meth), &attr_handler_vtbl)){
 			AV* const handler = newAV();
 
-			av_store(handler, M_METHOD, SvREFCNT_inc_simple_NN((SV*)GvCV(meth)));
-			av_store(handler, M_KLASS,  SvREFCNT_inc_simple_NN(klass));
-			av_store(handler, M_CODE,   newRV_inc((SV*)code));
-			av_store(handler, M_NAME,   newSVpvn_share(attr, namelen, 0U));
+			av_store(handler, SA_METHOD, SvREFCNT_inc_simple_NN((SV*)GvCV(meth)));
+			av_store(handler, SA_KLASS,  SvREFCNT_inc_simple_NN(klass));
+			av_store(handler, SA_CODE,   newRV_inc((SV*)code));
+			av_store(handler, SA_NAME,   newSVpvn_share(attr, namelen, 0U));
 
 			if(data){
-				av_store(handler, M_DATA,  newSVpvn(data, datalen));
+				av_store(handler, SA_DATA,  newSVpvn(data, datalen));
 			}
 
 			av_push(MY_CXT.queue, (SV*)handler);
