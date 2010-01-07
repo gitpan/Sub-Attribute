@@ -35,9 +35,7 @@ apply_handler(pTHX_ pMY_CXT_ AV* const handler){
 	dSP;
 
 	if(!CvGV(cv)){ /* dying by bad attributes */
-		if(ckWARN(WARN_MISC)){
-			Perl_warner(aTHX_ packWARN(WARN_MISC), "Attribute %"SVf" ignored for some reason", name);
-		}
+		Perl_qerror(aTHX_ ERRSV);
 		return;
 	}
 
@@ -71,10 +69,9 @@ apply_handler(pTHX_ pMY_CXT_ AV* const handler){
 	PL_stack_sp -= call_sv(method, G_VOID | G_EVAL);
 
 	if(SvTRUEx(ERRSV)){
-		if(ckWARN(WARN_MISC)){
-			Perl_warner(aTHX_ packWARN(WARN_MISC),
-			"Can't apply attribute %"SVf" because: %"SVf, name, ERRSV);
-		}
+		SV* const msg = sv_newmortal();
+		sv_setpvf(msg, "Can't apply attribute %"SVf" because: %"SVf, name, ERRSV);
+		Perl_qerror(aTHX_ msg);
 	}
 }
 
@@ -212,6 +209,22 @@ PPCODE:
 			av_push(MY_CXT.queue, (SV*)handler);
 		}
 		else{
+			if(MY_CXT.debug){
+				warn("ignore unrecognized attribute :%"SVf"\n", ST(i));
+			}
+#if PERL_BCDVERSION < 0x5008009
+			/* See RT #53420 */
+			{
+				const char* const a = SvPV_nolen_const(ST(i));
+				if(    strEQ(a, "lvalue")
+					|| strEQ(a, "method")
+					|| strEQ(a, "locked")
+					|| strEQ(a, "unique")
+					|| strEQ(a, "shared") ){
+					continue;
+			    }
+			}
+#endif
 			XPUSHs(ST(i));
 		}
 	}

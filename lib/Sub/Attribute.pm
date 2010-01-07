@@ -3,12 +3,12 @@ package Sub::Attribute;
 use 5.008_001;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
-use Exporter qw(import);
+use parent qw(Exporter);
 our @EXPORT = qw(ATTR_SUB MODIFY_CODE_ATTRIBUTES);
 
 use attributes ();
@@ -22,11 +22,9 @@ Sub::Attribute - Reliable subroutine attribute handlers
 
 =head1 VERSION
 
-This document describes Sub::Attribute version 0.02.
+This document describes Sub::Attribute version 0.03.
 
-=for test_synopsis
-
-	BEGIN{ $INC{'Attribute/Foo.pm'} = __FILE__ }
+=for test_synopsis BEGIN{ $INC{'Attribute/Foo.pm'} = __FILE__ }
 
 =head1 SYNOPSIS
 
@@ -65,7 +63,7 @@ in run-time C<eval()>, so C<ATTR(CODE)> is not reliable.
 
 =head2 The B<ATTR_SUB> meta attribute
 
-Defines a method as an subrouitne attribute handler.
+Defines a method as an subroutine attribute handler.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -97,7 +95,7 @@ Goro Fuji (gfx) E<lt>gfuji(at)cpan.orgE<gt>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009, Goro Fuji (gfx). Some rights reserved.
+Copyright (c) 2009-20010, Goro Fuji (gfx). Some rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
